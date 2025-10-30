@@ -32,11 +32,31 @@ export const signUpFormSchema = z
     name: z.string().min(3, "Name must be at least 3 characters"),
     email: z.email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
+
+export async function formatError(error: any) {
+  if (error.name === "ZodError") {
+    // Handle Zod error
+    const fieldErrors = Object.keys(error!.issues).map(
+      (field) => error.issues[field].message
+    );
+
+    return fieldErrors.join(". ");
+  } else if (
+    error.name === "PrismaClientKnownRequestError" &&
+    error.code === "P2002"
+  ) {
+    // handle zod errors
+    const field = error.meta?.target ? error.meta.target[0] : "Field";
+    return `${field.charAt(0).toUpperCase() + field.slice(1)} already exists`;
+  } else {
+    return typeof error.message === "string"
+      ? error.message
+      : JSON.stringify(error);
+  }
+}

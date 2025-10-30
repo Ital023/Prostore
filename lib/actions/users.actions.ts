@@ -2,8 +2,8 @@
 
 import { signIn, signOut } from "@/auth";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { signInFormSchema, signUpFormSchema } from "../validators";
-import { email, success } from "zod";
+import { formatError, signInFormSchema, signUpFormSchema } from "../validators";
+import z, { email, success } from "zod";
 import { hashSync } from "bcrypt-ts-edge";
 import { prisma } from "@/db/prisma";
 
@@ -63,7 +63,6 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
     if (isRedirectError(error)) {
       throw error;
     }
-    console.log(error);
-    return { success: false, message: "User was not registered" };
+    return { success: false, message: formatError(error) };
   }
 }
