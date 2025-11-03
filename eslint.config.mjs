@@ -1,4 +1,6 @@
-const eslintConfig = defineConfig([
+import next from 'eslint-config-next';
+
+export default [
   ...next(['core-web-vitals']),
   {
     rules: {
@@ -6,13 +8,13 @@ const eslintConfig = defineConfig([
       '@next/next/no-page-custom-font': 'off',
     },
   },
-  globalIgnores([
-    '.next/**',
-    'out/**',
-    'build/**',
-    'next-env.d.ts',
-    'lib/generated/prisma/**',
-  ]),
-]);
-
-export default eslintConfig;
+  {
+    ignores: [
+      '.next/**',
+      'out/**',
+      'build/**',
+      'next-env.d.ts',
+      'lib/generated/prisma/**',
+    ],
+  },
+];
