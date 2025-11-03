@@ -2,12 +2,28 @@
 
 import { cookies } from "next/headers";
 import { CartItem } from "@/types";
-import { formatError } from "../validators";
+import { cartItemSchema, formatError } from "../validators";
+import { auth } from "@/auth";
+import { prisma } from "@/db/prisma";
+import { convertToPlainObject } from "../utils";
 
 export async function addItemToCart(data: CartItem) {
   try {
+    const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+    if (!sessionCartId) throw new Error("Cart session not found!");
 
-    const sessionCartId = (await cookies()).get("sessionCartId")?.value
+    const session = await auth();
+    const userId = session?.user?.id ? (session.user.id as string) : undefined;
+
+    const cart = await getMyCart();
+
+    const item = cartItemSchema.parse(data);
+
+    const product = await prisma.product.findFirst({
+      where: { id: item.productId },
+    });
+
+    
 
     return {
       success: true,
@@ -19,4 +35,27 @@ export async function addItemToCart(data: CartItem) {
       message: formatError(error),
     };
   }
+}
+
+export async function getMyCart() {
+  const sessionCartId = (await cookies()).get("sessionCartId")?.value;
+  if (!sessionCartId) throw new Error("Cart session not found!");
+
+  const session = await auth();
+  const userId = session?.user?.id ? (session.user.id as string) : undefined;
+
+  const cart = await prisma.cart.findFirst({
+    where: userId ? { userId: userId } : { sessionCartId: sessionCartId },
+  });
+
+  if (!cart) return undefined;
+
+  return convertToPlainObject({
+    ...cart,
+    items: cart.items as CartItem[],
+    itemsPrice: cart.itemsPrice.toString(),
+    totalPrice: cart.totalPrice.toString(),
+    shippingPrice: cart.shippingPrice.toString(),
+    taxPrice: cart.taxPrice.toString(),
+  });
 }
