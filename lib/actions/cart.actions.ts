@@ -68,7 +68,7 @@ export async function addItemToCart(data: CartItem): Promise<{ success: boolean;
   } catch (error) {
     return {
       success: false,
-      message: string(formatError(error)),
+      message: "Something went wrong",
     };
   }
 }
