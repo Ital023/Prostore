@@ -24,7 +24,7 @@ const calcPrice = (items: CartItem[]) => {
   };
 };
 
-export async function addItemToCart(data: CartItem) {
+export async function addItemToCart(data: CartItem): Promise<{ success: boolean; message: string }> {
   try {
     const sessionCartId = (await cookies()).get("sessionCartId")?.value;
     if (!sessionCartId) throw new Error("Cart session not found!");
@@ -60,12 +60,15 @@ export async function addItemToCart(data: CartItem) {
         message: "Item added to cart",
       };
     } else {
-      
+      return {
+        success: true,
+        message: "Item added to cart",
+      };
     }
   } catch (error) {
     return {
       success: false,
-      message: formatError(error),
+      message: string(formatError(error)),
     };
   }
 }
