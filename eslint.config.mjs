@@ -1,8 +1,5 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
-import nextVitals from 'eslint-config-next/core-web-vitals'
-
 const eslintConfig = defineConfig([
-  ...nextVitals,
+  ...next(['core-web-vitals']),
   {
     rules: {
       'react/no-unescaped-entities': 'off',
@@ -16,6 +13,6 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'lib/generated/prisma/**',
   ]),
-])
+]);
 
-export default eslintConfig
+export default eslintConfig;
