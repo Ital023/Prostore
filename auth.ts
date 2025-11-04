@@ -14,6 +14,9 @@ export const config = {
     strategy: "jwt" as const,
     maxAge: 30 * 24 * 60 * 60,
   },
+  // In development we often rely on the Host request header (localhost).
+  // Auth.js requires `trustHost` to be true when relying on request headers.
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
